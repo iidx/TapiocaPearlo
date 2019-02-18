@@ -9,6 +9,7 @@ Developed by Namjun Kim <bunseokbot@gmail.com>
 from argparse import ArgumentParser
 
 from utils.logging.log import Log
+from utils.database.misc import dict_factory
 
 import sqlite3
 import os
@@ -19,15 +20,6 @@ class DairyParser(object):
 
     def __init__(self, database):
         self.database = database  # iSmartAlarm database
-
-    @staticmethod
-    def dict_factory(cursor, row):
-        """SQLite row factory for converting into dict type."""
-        data = {}
-        for idx, col in enumerate(cursor.description):
-            data[col[0]] = row[idx]
-
-        return data
 
     def parse(self):
         """Parse dairies from database."""
@@ -50,7 +42,7 @@ class DairyParser(object):
 
         # get dairies from database
         with sqlite3.connect(self.database) as con:
-            con.row_factory = self.dict_factory
+            con.row_factory = dict_factory
             cur = con.cursor()
 
             for key in tables.keys():

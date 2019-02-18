@@ -83,7 +83,7 @@ def main(args):
 
 
 if __name__ == '__main__':
-    parser = ArgumentParser(description="")
+    parser = ArgumentParser(description="iSmartAlarm dairy parser v1.0")
     parser.add_argument("-d", "--database", dest="database", type=str, required=True,
                         help="iSmartAlarm.DB database file path")
 

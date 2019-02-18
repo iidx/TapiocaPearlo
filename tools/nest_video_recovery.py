@@ -111,7 +111,7 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="")
+    parser = ArgumentParser(description="Nest video recovery tool v1.0")
     parser.add_argument("-d", "--database", dest="database", type=str, required=True,
                         help="frame_database file path")
     parser.add_argument("-o", "--output", dest="output", type=str, default="output",

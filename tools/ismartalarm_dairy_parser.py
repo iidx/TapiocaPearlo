@@ -28,16 +28,16 @@ class DairyParser(object):
         Log.debug("Extracting diaries from database...")
 
         tables = {
-            'CameraDiary': {
+            'CameraDairy': {
                 'name': 'TB_CameraDairy',
             },
-            'IPUDiary': {
+            'IPUDairy': {
                 'name': 'TB_IPUDairy',
             },
-            'ISC3Diary': {
+            'ISC3Dairy': {
                 'name': 'TB_ISC3Dairy',
             },
-            'SensorDiary': {
+            'SensorDairy': {
                 'name': 'TB_SensorDairy',
             }
         }

@@ -5,7 +5,7 @@ RUN apt-get update && \
 	apt-get install -y ffmpeg && \
 	rm -rf /var/lib/apt/lists/*
 
-WORKDIR ["/home"]
+WORKDIR "/home"
 
 # Install Python requirements 
 COPY requirements.txt .

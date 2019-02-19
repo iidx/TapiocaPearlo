@@ -19,7 +19,7 @@ class Elastic:
             raise ConnectionError("Elasticsearch server is down")
 
     def __enter__(self):
-        pass
+        return self.client
 
     def upload(self, documents):
         data = [{

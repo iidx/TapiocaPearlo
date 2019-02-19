@@ -64,8 +64,8 @@ class DairyParser(object):
                 for i in range(len(data)):
                     data[i]['date'] = to_datetime(data[i]['date'])
 
-                with Elastic(index='dfrws', doc_type=key) as elastic:
-                    elastic.upload(data)
+                with Elastic(index=key.lower(), doc_type=key.lower()) as elastic:
+                    elastic.upload(data, 'date')
                 
                 Log.info(f"Successfully uploaded {key} data into elasticsearch.")
 

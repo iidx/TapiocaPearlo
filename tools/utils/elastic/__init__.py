@@ -21,11 +21,14 @@ class Elastic:
     def __enter__(self):
         return self
 
-    def upload(self, documents):
+    def upload(self, documents, key):
         data = [{
             "_index": self.index,
             "_type": self.doc_type,
-            "_source": document
+            "_source": {
+                'time': document[key],
+                'message': document
+            }
         } for document in documents]
 
         helpers.bulk(self.client, data)

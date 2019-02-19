@@ -93,8 +93,8 @@ class VideoExtractor(object):
 
         # upload to elasticsearch for add timeline
         if add_timeline:
-            with Elastic(index='dfrws', doc_type='NestVideo') as elastic:
-                elastic.upload(documents)
+            with Elastic(index='nest', doc_type='video') as elastic:
+                elastic.upload(documents, 'start_time')
 
     def save(self, merge):
         """Convert and save into playable video."""

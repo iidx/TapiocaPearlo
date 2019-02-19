@@ -46,8 +46,8 @@ class WinkActivityParser(object):
         for i in range(len(activities)):
             activities[i]['created_at'] = to_datetime(activities[i]['created_at'])
 
-        with Elastic(index='dfrws', doc_type='WinkActivity') as elastic:
-            elastic.upload(activities)
+        with Elastic(index='wink', doc_type='activity') as elastic:
+            elastic.upload(activities, 'created_at')
 
         Log.info("Successfully uploaded wink activity data into elasticsearch.")
 

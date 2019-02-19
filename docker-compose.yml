@@ -18,8 +18,6 @@ services:
         hard: 65536
     cap_add:
       - IPC_LOCK
-    volumes:
-      - ./backup/elasticsearch:/usr/share/elasticsearch/data
     networks:
       - tapioca
 

@@ -30,7 +30,7 @@ class VideoExtractor(object):
         if not os.path.exists(output):
             os.mkdir(output)
 
-    def extract(self, merge):
+    def extract(self, merge, add_timeline):
         """Extract frames from database."""
         Log.debug("Extracting videos from database...")
 
@@ -73,6 +73,29 @@ class VideoExtractor(object):
 
         self.save(merge)
 
+        documents = []
+
+        for filename in self.videotimes.keys():
+            runtime = self.videotimes[filename]
+            start, end = to_datetime(runtime[0]), to_datetime(runtime[-1])
+            filename = os.path.basename(filename).replace('tmp', 'mp4')
+
+            documents.append({
+                'start_time': start,
+                'end_time': end,
+                'filename': filename
+            })
+
+        # write history as file
+        with open(os.path.join(self.output, 'video_list.txt'), 'w') as f:
+            for document in documents:
+                f.write(f"{document['filename']}: {document['start_time']} - {document['end_time']}\n")
+
+        # upload to elasticsearch for add timeline
+        if add_timeline:
+            with Elastic(index='dfrws', doc_type='NestVideo') as elastic:
+                elastic.upload(documents)
+
     def save(self, merge):
         """Convert and save into playable video."""
         Log.info("Converting video file codec format...")
@@ -97,12 +120,6 @@ class VideoExtractor(object):
 
             Log.info(f"Successfully merged {len(self.rawvideos)} videos.")
 
-        for filename in self.videotimes.keys():
-            runtime = self.videotimes[filename]
-            start, end = to_datetime(runtime[0]), to_datetime(runtime[-1])
-            with open(os.path.join('output', 'video_list.txt'), 'a+') as f:
-                f.write(f"{filename.replace('tmp', 'mp4')}: {start} - {end}\n")
-
     def __del__(self):
         del self
 
@@ -114,7 +131,7 @@ def main(args):
         return
 
     ve = VideoExtractor(args.database, args.output)
-    ve.extract(args.merge)
+    ve.extract(args.merge, args.add_timeline)
     del ve
 
 
@@ -126,6 +143,8 @@ if __name__ == "__main__":
                         help="extracted video output file directory")
     parser.add_argument("-m", "--merge", dest="merge", type=bool, default=False,
                         help="merge all frames extracted from database")
+    parser.add_argument("-a", "--add-timeline", dest="add_timeline", type=bool, default=False,
+                        help="Add recording history at timeline with filename")
 
     args = parser.parse_args()
     main(args)

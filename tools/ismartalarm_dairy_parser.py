@@ -10,6 +10,8 @@ from argparse import ArgumentParser
 
 from utils.logging.log import Log
 from utils.database.misc import dict_factory
+from utils.elastic import Elastic
+from utils.time import to_datetime
 
 import sqlite3
 import os
@@ -58,6 +60,14 @@ class DairyParser(object):
         """Save history into elasticsearch."""
         for key in tables.keys():
             data = tables[key]['data']
+            if data:
+                for i in range(len(data)):
+                    data[i]['date'] = to_datetime(data[i]['date'])
+
+                with Elastic(index='dfrws', doc_type=key) as elastic:
+                    elastic.upload(data)
+                
+                Log.info(f"Successfully uploaded {key} data into elasticsearch.")
 
     def __del__(self):
         del self

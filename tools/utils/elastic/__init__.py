@@ -9,7 +9,7 @@ class ConnectionError(Exception):
 class Elastic:
     """Helper for insert data into elasticsearch."""
 
-    def __enter__(self, index, doc_type):
+    def __init__(self, index, doc_type):
         self.index = index
         self.doc_type = doc_type
         self.client = Elasticsearch(["http://elasticsearch:9200"])
@@ -17,6 +17,9 @@ class Elastic:
         # if server is invalid (elasticsearch is not active)
         if not self.client.ping():
             raise ConnectionError("Elasticsearch server is down")
+
+    def __enter__(self):
+        pass
 
     def upload(self, documents):
         data = [{

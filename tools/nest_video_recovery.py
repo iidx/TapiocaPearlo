@@ -10,6 +10,8 @@ from argparse import ArgumentParser
 from pathlib import Path
 
 from utils.logging.log import Log
+from utils.elastic import Elastic
+from utils.time import to_datetime
 
 import sqlite3
 import os
@@ -94,6 +96,12 @@ class VideoExtractor(object):
                 os.remove(f"{video.split('.')[0]}.mp4")
 
             Log.info(f"Successfully merged {len(self.rawvideos)} videos.")
+
+        for filename in self.videotimes.keys():
+            runtime = self.videotimes[filename]
+            start, end = to_datetime(runtime[0]), to_datetime(runtime[-1])
+            with open(os.path.join('output', 'video_list.txt'), 'a+') as f:
+                f.write(f"{filename.replace('tmp', 'mp4')}: {start} - {end}\n")
 
     def __del__(self):
         del self

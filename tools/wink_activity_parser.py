@@ -10,6 +10,8 @@ from argparse import ArgumentParser
 
 from utils.logging.log import Log
 from utils.database.misc import dict_factory
+from utils.elastic import Elastic
+from utils.time import to_datetime
 
 import sqlite3
 import json
@@ -40,6 +42,14 @@ class WinkActivityParser(object):
     def save(self, data):
         """Save activity into elasticsearch."""
         activities = [json.loads(activity['Json']) for activity in data]
+
+        for i in range(len(activities)):
+            activities[i]['created_at'] = to_datetime(activities[i]['created_at'])
+
+        with Elastic(index='dfrws', doc_type='WinkActivity') as elastic:
+            elastic.upload(activities)
+
+        Log.info("Successfully uploaded wink activity data into elasticsearch.")
 
     def __del__(self):
         del self

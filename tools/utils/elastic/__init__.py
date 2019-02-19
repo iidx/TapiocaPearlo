@@ -12,7 +12,7 @@ class Elastic:
     def __enter__(self, index, doc_type):
         self.index = index
         self.doc_type = doc_type
-        self.client = Elasticsearch(["http://localhost:9200"])
+        self.client = Elasticsearch(["http://elasticsearch:9200"])
 
         # if server is invalid (elasticsearch is not active)
         if not self.client.ping():

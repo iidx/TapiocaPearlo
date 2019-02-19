@@ -34,6 +34,18 @@ services:
     networks:
       - tapioca
 
+    tapioca_terminal:
+      image: tapioca:latest
+      container_name: tapioca_terminal
+      build:
+        context: .
+        dockerfile: Dockerfile
+      volumes:
+        - ./tools:/home/
+      networks:
+        - tapioca
+
+
 networks:
   tapioca:
     name: tapioca

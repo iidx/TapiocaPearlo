@@ -3,7 +3,7 @@ MAINTAINER Namjun Kim <bunseokbot@gmail.com>
 
 RUN apt-get update && \
 	apt-get install -y ffmpeg && \
-	rm /var/lib/apt/lists/*
+	rm -rf /var/lib/apt/lists/*
 
 WORKDIR ["/home"]
 

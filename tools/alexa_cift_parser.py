@@ -7,7 +7,7 @@ Developed by Namjun Kim <bunseokbot@gmail.com>
 """
 
 from argparse import ArgumentParser
-from datetime import datetime
+from datetime import datetime, timezone
 
 from utils.logging.log import Log
 from utils.database.misc import dict_factory
@@ -48,7 +48,7 @@ class CIFTDatabaseParser(object):
 
         Log.info("Successfully parsed data from database.")
 
-        self.save(documents)
+        # self.save(documents)
 
     def save(self, documents):
         with Elastic(index='alexa', doc_type='activity') as elastic:
@@ -58,10 +58,8 @@ class CIFTDatabaseParser(object):
 
     def convert_time(self, date, time):
         """Convert splited time into datetime."""
-        return datetime.strptime(
-            f"{date} {time} {self.timezone}", "%Y-%m-%d %H:%M:%S.%f %Z%z")
-
-
+        return datetime.strptime(f"{date} {time} {self.timezone}",
+                                 "%Y-%m-%d %H:%M:%S.%f %Z%z").astimezone(timezone.utc)
     def __del__(self):
         del self
 

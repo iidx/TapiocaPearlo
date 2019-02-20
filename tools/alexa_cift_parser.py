@@ -48,7 +48,7 @@ class CIFTDatabaseParser(object):
 
         Log.info("Successfully parsed data from database.")
 
-        # self.save(documents)
+        self.save(documents)
 
     def save(self, documents):
         with Elastic(index='alexa', doc_type='activity') as elastic:

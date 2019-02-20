@@ -51,7 +51,9 @@ class CIFTDatabaseParser(object):
         self.save(documents)
 
     def save(self, documents):
-        Log.debug(documents)
+        with Elastic(index='alexa', doc_type='activity') as elastic:
+            elastic.upload(documents, 'time')
+
         Log.info("Successfully uploaded data into elasticsearch.")
 
     def convert_time(self, date, time):

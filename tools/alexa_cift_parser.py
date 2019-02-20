@@ -11,8 +11,10 @@ from datetime import datetime, timezone
 
 from utils.logging.log import Log
 from utils.database.misc import dict_factory
+from utils.time import to_datetime
 from utils.elastic import Elastic
 
+import time
 import sqlite3
 import os
 
@@ -56,10 +58,17 @@ class CIFTDatabaseParser(object):
 
         Log.info("Successfully uploaded data into elasticsearch.")
 
-    def convert_time(self, date, time):
+    def convert_time(self, date, _time):
         """Convert splited time into datetime."""
-        return datetime.strptime(f"{date} {time} {self.timezone}",
-                                 "%Y-%m-%d %H:%M:%S.%f %Z%z").astimezone(timezone.utc)
+        dtime = datetime.strptime(f"{date} {_time} {self.timezone}", "%Y-%m-%d %H:%M:%S.%f %Z%z")
+        
+        # check timestamp is 0
+        if dtime.timestamp() <= 0:
+            return to_datetime(0)
+
+        return dtime.astimezone(timezone.utc)\
+                    .replace(tzinfo=None)
+
     def __del__(self):
         del self
 

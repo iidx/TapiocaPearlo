@@ -65,7 +65,7 @@ All of TapiocaPearlo tools are located at `tools`.
 
 
 
-####Wink Activity Parser
+#### Wink Activity Parser
 
 ```bash
 python wink_activity_parser.py -d <WINK_DATABASE_FILE_PATH>
@@ -73,7 +73,7 @@ python wink_activity_parser.py -d <WINK_DATABASE_FILE_PATH>
 
 
 
-####Nest Video Recovery Tool
+#### Nest Video Recovery Tool
 
 ```bash
 python nest_video_recovery.py -d <NEST_DATABASE_FILE_PATH> -o <VIDEO_FILE_OUTPUT_DIRECTORY> -m <MERGE_VIDEO_CLIP> -a <UPLOAD_TO_ELASTICSEARCH>
@@ -89,7 +89,7 @@ python ismartalarm_dairy_parser.py -d <ISMARTALARM_DATABASE_FILE_PATH>
 
 
 
-####Amazon Alexa CIFT Tool Parser
+#### Amazon Alexa CIFT Tool Parser
 
 ```bash
 python alexa_cift_parser.py -d <CIFT_DATABASE_FILE_PATH> -t <TIMEZONE>

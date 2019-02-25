@@ -3,15 +3,18 @@
     is_detected가 0이고, 문을 열고 있는 이벤트라면 사이렌 알람도 발생한다.
     SIRENOP::door is open, all the siren need doorbell!!!
 """
+import sys
+
 import re
 import json
 import datetime
 
 class Analyzer:
     def __init__(self, file_path):
-        self.f = open(file_path)
-        self.contents = self.f.read()
-
+        with open(file_path, 'rb') as f:
+            s = f.read()
+        s = s[0xe0000:]
+        self.contents = str(s)
     def __timestamp_to_datetime(self, ts):
         utc_plus_2hr = datetime.timedelta(hours=2)
         resp_dt = datetime.datetime.utcfromtimestamp(int(ts))
@@ -31,13 +34,14 @@ class Analyzer:
 
     def get_logs(self, tag):
         logs = re.findall(r'\$\@[A-Za-z0-9]+::'+tag+'::(.+)', self.contents)
+        print(logs[0])
         for dt, log, is_detected in self.__split_log(logs):
             print(dt, ':', log, ' - is detected:', is_detected)
 
 tags = ['ALARMPIR',  #Motion Sensor
         'ALARMDOOR', #Contact Sensor
        ]
-analyzer = Analyzer('./diagnostics.log')
+analyzer = Analyzer(sys.argv[1])
 for tag in tags:
     analyzer.get_logs(tag)
 

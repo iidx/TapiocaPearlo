@@ -36,25 +36,40 @@ import utils.time
 
 class ISADiagnoticsStreamParser:
     def __init__(self, diagnotics_stream):
-        self.index = 0
-        self.dataset = []
         try:
             with open(diagnotics_stream, 'rb') as f:
-                stream = f.read()
+                self.stream = f.read()
         except:
             #alert error. need to logging.
             sys.exit(-1)
 
-        #exclude signatures table
-        #self.unstructured_stream_parser(stream[0x60000:0xE0000])
-        self.readable_stream_parser(stream[0xE0000:])
+    def get_unstructured_log(self):
+        self.unstructured_stream_parser(self.stream[0x60000:0xE0000])
+        return self.unstructured_log
 
-    def readable_stream_parser(self, stream):
-        stream = str(stream).replace('\r\n', '\x0d\x0a')
-        print(stream)
+    def get_sensor_log(self):
+        self.sensor_log_stream_parser(self.stream[0xE0000:])
+        return self.sensor_log
 
+    def sensor_log_stream_parser(self, stream):
+        self.sensor_log = []
+        stream = stream.replace(b'\x00', b'')
+        stream = stream.split(b'$@')
+        for s in stream:
+            if not s:
+                continue
+            _, sign, desc = s.split(b"::")
+            if sign == b'ALARMDOOR' or sign == b'ALARMPIR':
+                try:
+                    data = json.loads(desc)
+                    log = self.__sensor_log_repackager(data)
+                    self.sensor_log.append(log)
+                except:
+                    pass
 
     def unstructured_stream_parser(self, stream):
+        self.index = 0
+        self.unstructured_log = []
         while True:
             self.log = dict()
             sign = stream.find(b'\x24\x40')
@@ -76,8 +91,34 @@ class ISADiagnoticsStreamParser:
             else:
                 self.__isa_parse(parsed_data[2])
             self.__classifier()
-            self.dataset.append(self.log)
+            self.unstructured_log.append(self.log)
             self.index += 1
+
+    def __sensor_log_repackager(self, log_data):
+        """
+            000A8540: Contact Sensor
+            0006B4E5: PIR Sensor
+        """
+        sensors = {
+            '000A8540': 'Contact',
+            '0006B4E5': 'PIR',
+        }
+        dt_ = utils.time.to_datetime(log_data['TS'], timezone=2)
+        package = {
+            'datetime': dt_,
+            'sensor': sensors[log_data['SensorID']],
+            'sensor_id': log_data['SensorID'],
+            'event': False,
+            'siren': False,
+            'is_detected': False,
+        }
+        if log_data['MessageType'] == '0':
+            package.update({'event':True})
+        if log_data['MessageType'] == '0' and log_data['ModeId'] == '2':
+            package.update({'siren':True})
+        if log_data['DetectAlarm'] == '1':
+            package.update({'is_detected':True})
+        return package
 
     def __unpack_to_update(self, data, labels, unpack_tags):
         pseudo_tag = namedtuple('pseudo_tag', labels)
@@ -107,10 +148,11 @@ class ISADiagnoticsStreamParser:
             if types == [21, 1, 10]:
                 self.log.update({
                     'data_type': 'datetime',
-                    'data': utils.time.to_datetime(self.log['data'])
+                    'data': utils.time.to_datetime(self.log['data'], timezone=2)
                 })            
             else:
                 self.log.update({'data_type':'raw'})
 
-isa_parser = ISADiagnoticsStreamParser(sys.argv[1])
-#print(isa_parser.dataset)
+isap = ISADiagnoticsStreamParser(sys.argv[1])
+print(isap.get_unstructured_log())
+print(isap.get_sensor_log())

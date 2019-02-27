@@ -1,13 +1,18 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 # DFRWS2018 ISmartAlarm diagnotics stream parser
-import re
-import sys
-import json
-import struct
+from argparse import ArgumentParser
 from collections import namedtuple
 
-import utils.time
+from utils.elastic import Elastic
+from utils.logging.log import Log
+from utils.time import to_datetime
+
+import re
+import os
+import json
+import struct
+
 """
 !!!THIS IS DEPRECATED FORMAT!!!
 !!!THIS IS DEPRECATED FORMAT!!!
@@ -103,7 +108,7 @@ class ISADiagnoticsStreamParser:
             '000A8540': 'Contact',
             '0006B4E5': 'PIR',
         }
-        dt_ = utils.time.to_datetime(log_data['TS'], timezone=2)
+        dt_ = to_datetime(log_data['TS'])
         package = {
             'datetime': dt_,
             'sensor': sensors[log_data['SensorID']],
@@ -148,11 +153,44 @@ class ISADiagnoticsStreamParser:
             if types == [21, 1, 10]:
                 self.log.update({
                     'data_type': 'datetime',
-                    'data': utils.time.to_datetime(self.log['data'], timezone=2)
+                    'data': to_datetime(self.log['data'])
                 })            
             else:
                 self.log.update({'data_type':'raw'})
 
-isap = ISADiagnoticsStreamParser(sys.argv[1])
-print(isap.get_unstructured_log())
-print(isap.get_sensor_log())
+
+def main(args):
+    if not os.path.exists(args.server_stream):
+        Log.error("server_stream file not exist.")
+        return
+
+    Log.info("Start parsing iSmartAlarm diagnotics stream...")
+
+    isap = ISADiagnoticsStreamParser(args.server_stream)
+    unstructured_log = isap.get_unstructured_log()
+    sensor_log = isap.get_sensor_log()
+
+    with Elastic(index='unstructured_log', doc_type='unstructured_log') as elastic:
+        datetime_log = []
+
+        for log in unstructured_log:
+            if 'data_type' in log.keys():
+                if log['data_type'] == 'datetime':
+                    datetime_log.append(log)
+        elastic.upload(datetime_log, 'datetime')
+
+    with Elastic(index='sensor_log', doc_type='sensor_log') as elastic:
+        elastic.upload(sensor_log, 'datetime')
+
+    Log.i("Successfully upload server_stream data.")
+
+    del isap
+
+
+if __name__ == '__main__':
+    parser = ArgumentParser(description="iSmartAlarm diagnotics server stream parser")
+    parser.add_argument('-s', '--server-stream', type=str,
+        help='iSmartAlarm server_stream file path')
+
+    args = parser.parse_args()
+    main(args)

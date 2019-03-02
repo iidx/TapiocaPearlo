@@ -6,7 +6,7 @@ import math
 def to_datetime(timestamp, timezone=0):
     """Convert timestamp into datetime."""
     # change timestamp type if type is string 
-    if type(timestamp) is str:
+    if type(timestamp) is str or type(timestamp) is bytes:
         timestamp = int(timestamp)
 
     if type(timestamp) is int:

@@ -1,0 +1,49 @@
+version: '3.5'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.5.0
+    container_name: elasticsearch
+    restart: always
+    environment:
+      - cluster.name=tapioca-cluster
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    cap_add:
+      - IPC_LOCK
+    networks:
+      - tapioca
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.5.0
+    container_name: kibana
+    environment:
+      - SERVER_NAME=tapioca.kibana
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    ports:
+      - 5601:5601
+    networks:
+      - tapioca
+
+  tapioca_terminal:
+    image: tapioca:latest
+    container_name: tapioca_terminal
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["tail", "-f", "/dev/null"]
+    volumes:
+      - ./tools:/home/
+    networks:
+      - tapioca
+
+networks:
+  tapioca:
+    name: tapioca

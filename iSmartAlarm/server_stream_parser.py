@@ -67,7 +67,7 @@ class ISADiagnoticsStreamParser:
             if sign == b'ALARMDOOR' or sign == b'ALARMPIR':
                 try:
                     data = json.loads(desc)
-                    log = self.__sensor_log_repackager(data)
+                    log = self.__sensor_log_repackager(data, sign)
                     self.sensor_log.append(log)
                 except:
                     pass
@@ -99,7 +99,7 @@ class ISADiagnoticsStreamParser:
             self.unstructured_log.append(self.log)
             self.index += 1
 
-    def __sensor_log_repackager(self, log_data):
+    def __sensor_log_repackager(self, log_data, sign):
         """
             000A8540: Contact Sensor
             0006B4E5: PIR Sensor
@@ -111,6 +111,7 @@ class ISADiagnoticsStreamParser:
         dt_ = to_datetime(log_data['TS'])
         package = {
             'datetime': dt_,
+            'sign': sign,
             'sensor': sensors[log_data['SensorID']],
             'sensor_id': log_data['SensorID'],
             'event': False,

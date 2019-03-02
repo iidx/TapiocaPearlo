@@ -89,6 +89,13 @@ python ismartalarm_dairy_parser.py -d <ISMARTALARM_DATABASE_FILE_PATH>
 
 
 
+#### iSmartAlarm Server Stream Parser
+
+```bash
+python server_stream_parser.py -s <ISMARTALARM_SERVER_STREAM_FILE_PATH>
+```
+
+
 #### Amazon Alexa CIFT Tool Parser
 
 ```bash

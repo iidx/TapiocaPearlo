@@ -76,7 +76,7 @@ python wink_activity_parser.py -d <WINK_DATABASE_FILE_PATH>
 #### Nest Video Recovery Tool
 
 ```bash
-python nest_video_recovery.py -d <NEST_DATABASE_FILE_PATH> -o <VIDEO_FILE_OUTPUT_DIRECTORY> -m <MERGE_VIDEO_CLIP> -a <UPLOAD_TO_ELASTICSEARCH>
+python nest_video_recovery.py -d <NEST_DATABASE_FILE_PATH> -o <VIDEO_FILE_OUTPUT_DIRECTORY> -m <MERGE_VIDEO_CLIP> -f <EXTRACT_FRAME_BY_PNG> -a <UPLOAD_TO_ELASTICSEARCH>
 ```
 
 

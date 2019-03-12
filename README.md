@@ -101,19 +101,3 @@ python server_stream_parser.py -s <ISMARTALARM_SERVER_STREAM_FILE_PATH>
 ```bash
 python alexa_cift_parser.py -d <CIFT_DATABASE_FILE_PATH> -t <TIMEZONE>
 ```
-
-
-
-### Visualization
-
-TO-DO
-
-
-
-## Developers
-
-All the `TapiocaPearlo` Team members are involved.
-
-- Gyuho Lee ([@extr](https://github.com/iidx))
-- Namjun Kim ([@bunseokbot](https://github.com/bunseokbot))
-

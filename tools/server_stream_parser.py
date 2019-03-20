@@ -13,32 +13,6 @@ import json
 import struct
 import sys
 
-"""
-!!!THIS IS DEPRECATED FORMAT!!!
-!!!THIS IS DEPRECATED FORMAT!!!
-!!!THIS IS DEPRECATED FORMAT!!!
-# Log stream header
-- 0x0  ~ 0x0F (16byte): ??? (auth key: ref. network_collect.py)
-- 0x10 ~ 0x1F (16byte): ??? (auth key: ref. network_collect.py)
-- 0x20 ~ 0x2F (16byte): ??? (log signature: ref. brainfficial)
-- 0x30 ~ 0x3B (12byte): ??? (???)
-
-# Sliced log signature table
-## table range: 0x3C ~ EOF
-## unit : 6byte
-- 0x0 ~ 0x4 (4byte): log signature
-- 0x5 ~ 0x6 (2byte): ???
-
-# slaced log
-- 0x0 ~ 0x1 (2byte): log signature 2 ("$@")
-- 0x2 ~ 0x5 (4byte): log data size
-- 0x6 ~ 0x9 (4byte): log signature
-- 0xA ~ EOF: log data
-!!!THIS IS DEPRECATED FORMAT!!!
-!!!THIS IS DEPRECATED FORMAT!!!
-!!!THIS IS DEPRECATED FORMAT!!!
-"""
-
 class ISADiagnoticsStreamParser:
     def __init__(self, diagnotics_stream):
         try:
@@ -141,8 +115,6 @@ class ISADiagnoticsStreamParser:
         self.log.update({'sign': self.log['sign'].decode()})
 
     def __general_parse(self, data):
-        #8byte만 지원함
-        #가끔 BC, TCP 태그 가진 애들 중에 9바이트인 애들 있음.
         if len(data) % 4 != 0:
             self.log['desc'] = 'dummy'
             return
@@ -156,7 +128,7 @@ class ISADiagnoticsStreamParser:
                 self.log.update({
                     'data_type': 'datetime',
                     'data': to_datetime(self.log['data'])
-                })            
+                })
             else:
                 self.log.update({'data_type':'raw'})
 
